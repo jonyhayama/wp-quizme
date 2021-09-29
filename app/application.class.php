@@ -55,6 +55,8 @@ class wpQuizme{
 	}
 
 	public function register_autoload(){
+		require WP_QUIZME_DIR_PATH . '/vendor/autoload.php';
+
     spl_autoload_register(function ($class_name) {
       if( strpos( $class_name, 'wpQuizme') === 0 ){
 				$classPath = WP_QUIZME_APP_PATH;
@@ -74,6 +76,8 @@ class wpQuizme{
 		$this->quiz = new \wpQuizme\model\quiz;
 		$this->quizController = new \wpQuizme\controller\quizController;
 		$this->quizAdminController = new \wpQuizme\controller\quizAdminController;
+		$this->setttingsController = new \wpQuizme\controller\settingsController;
+		$this->googleSheetsService = new \wpQuizme\services\googleSheetsService;
   }
 
   public function add_hooks(){
