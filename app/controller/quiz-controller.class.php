@@ -2,6 +2,8 @@
 
 namespace wpQuizme\controller;
 
+use \Google;
+
 class quizController {
   public function __construct() {
     add_action('wp_enqueue_scripts', [$this, 'register_scripts']);
@@ -32,6 +34,45 @@ class quizController {
   }
 
   public function get_quiz_ajax() {
+    // ini_set('display_errors', 1);
+    // ini_set('display_startup_errors', 1);
+    // error_reporting(E_ALL);
+
+    // $quiz_id = (int) $_GET['id'];
+    // $quiz_config = json_decode(get_post_meta($quiz_id, 'quizme_json', true));
+    // $options = json_decode(get_post_meta($quiz_id, 'quizme_options_json', true));
+    // $service = wp_quizme('googleSheetsService')->getService();
+
+    // $spreadsheetId = $options->spreadsheetId;
+    // $range = $options->range;
+    // $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+    // $values = $response->getValues();
+
+    // if (empty($values)) {
+    //   echo "No data found.\n";
+    // } else {
+    //   echo "Name, Major:\n";
+    //   foreach ($values as $row) {
+    //     // Print columns A and E, which correspond to indices 0 and 4.
+    //     printf("%s, %s\n", $row[0], $row[4]);
+    //   }
+    // }
+
+    // echo 'HERE';
+
+    // $values = [
+    //   ["a", "b", "C", "D", "E"]
+    // ];
+    // $body = new Google\Service\Sheets\ValueRange([
+    //   'values' => $values
+    // ]);
+    // $params = [
+    //   'valueInputOption' => "RAW"
+    // ];
+    // // $result = $service->spreadsheets_values->append($spreadsheetId, $range, $body, $params);
+    // // var_dump($result);
+
+    // exit;
     $post_id = (int) $_GET['id'];
     $quiz_json = get_post_meta($post_id, 'quizme_json', true);
 
@@ -48,7 +89,7 @@ class quizController {
     $quiz_options = json_decode(get_post_meta($post_id, 'quizme_options_json', true));
     $redirectTo = end($quiz_options->redirectTo);
     foreach ($quiz_options->redirectTo as $r) {
-      if ($r->score > $score) {
+      if ($r->score < $score) {
         $redirectTo = $r;
         break;
       }
