@@ -33,12 +33,16 @@ class quizAdminController {
 
     $json = $_POST['quizme-json'];
     update_post_meta( $post->ID, 'quizme_json', $json );
+
+    $json = $_POST['quizme-options-json'];
+    update_post_meta( $post->ID, 'quizme_options_json', $json );
   }
 
   public function render_metabox() {
     global $post;
     wp_nonce_field('quizme_form_metabox_nonce', 'quizme_form_metabox_process');
-    $val = get_post_meta($post->ID, 'quizme_json', true);
+    $quiz_config = get_post_meta($post->ID, 'quizme_json', true);
+    $options = get_post_meta($post->ID, 'quizme_options_json', true);
     echo '<div>';
     echo '<strong>Shortcode:</strong>';
     if ($post->ID) {
@@ -48,13 +52,18 @@ class quizAdminController {
     }
     echo '</div>';
     echo '<div>';
-    echo '<strong>Config (JSON):</strong>';
-    echo '<textarea id="quizme-json" name="quizme-json">' . esc_textarea($val) . '</textarea>';
+    echo '<strong>Quiz Config (JSON):</strong>';
+    echo '<textarea id="quizme-json" name="quizme-json">' . esc_textarea($quiz_config) . '</textarea>';
+    echo '</div>';
+    echo '<div>';
+    echo '<strong>Quiz Options (JSON):</strong>';
+    echo '<textarea id="quizme-options-json" name="quizme-options-json">' . esc_textarea($options) . '</textarea>';
     echo '</div>';
     echo '
     <script>
     jQuery(document).ready(function($) {
       wp.codeEditor.initialize($("#quizme-json"), cm_settings);
+      wp.codeEditor.initialize($("#quizme-options-json"), cm_settings);
     })
     </script>
     <style>

@@ -40,13 +40,24 @@ class quizController {
   }
 
   public function post_quiz_ajax() {
-    // $post_id = (int) $_GET['id'];
     $json = file_get_contents('php://input');
     $data = json_decode($json);
     $score = (int) $data->score;
 
+    $post_id = (int) $_GET['id'];
+    $quiz_options = json_decode(get_post_meta($post_id, 'quizme_options_json', true));
+    $redirectTo = end($quiz_options->redirectTo);
+    foreach ($quiz_options->redirectTo as $r) {
+      if ($r->score > $score) {
+        $redirectTo = $r;
+        break;
+      }
+    }
+
+    $redirectTo = get_permalink($redirectTo->pageId);
+
     echo json_encode([
-      'redirectTo' => "https://localhost/quizme/sample-server/php/results.php?score=$score&asdf",
+      'redirectTo' => $redirectTo,
       'originalData' => $data
     ]);
     exit;
