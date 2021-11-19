@@ -3,7 +3,7 @@
 Plugin Name: WP Quiz Me
 Plugin URI: 
 Description: WP Quiz Me
-Version: 0.0.1
+Version: 0.0.2
 Author: Jony Hayama
 Author URI: https://jony.dev
 */
