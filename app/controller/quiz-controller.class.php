@@ -34,50 +34,32 @@ class quizController {
   }
 
   public function get_quiz_ajax() {
-    // ini_set('display_errors', 1);
-    // ini_set('display_startup_errors', 1);
-    // error_reporting(E_ALL);
-
-    // $quiz_id = (int) $_GET['id'];
-    // $quiz_config = json_decode(get_post_meta($quiz_id, 'quizme_json', true));
-    // $options = json_decode(get_post_meta($quiz_id, 'quizme_options_json', true));
-    // $service = wp_quizme('googleSheetsService')->getService();
-
-    // $spreadsheetId = $options->spreadsheetId;
-    // $range = $options->range;
-    // $response = $service->spreadsheets_values->get($spreadsheetId, $range);
-    // $values = $response->getValues();
-
-    // if (empty($values)) {
-    //   echo "No data found.\n";
-    // } else {
-    //   echo "Name, Major:\n";
-    //   foreach ($values as $row) {
-    //     // Print columns A and E, which correspond to indices 0 and 4.
-    //     printf("%s, %s\n", $row[0], $row[4]);
-    //   }
-    // }
-
-    // echo 'HERE';
-
-    // $values = [
-    //   ["a", "b", "C", "D", "E"]
-    // ];
-    // $body = new Google\Service\Sheets\ValueRange([
-    //   'values' => $values
-    // ]);
-    // $params = [
-    //   'valueInputOption' => "RAW"
-    // ];
-    // // $result = $service->spreadsheets_values->append($spreadsheetId, $range, $body, $params);
-    // // var_dump($result);
-
-    // exit;
     $post_id = (int) $_GET['id'];
     $quiz_json = get_post_meta($post_id, 'quizme_json', true);
 
     echo $quiz_json;
     exit;
+  }
+
+  public function save_data_to_gsheet($data, $options) {
+    $service = wp_quizme('googleSheetsService')->getService();
+    $spreadsheetId = $options->spreadsheetId;
+    $range = $options->range;
+    if (!$spreadsheetId || !$range) {
+      return;
+    }
+
+    $values = [
+      $data
+    ];
+    $body = new Google\Service\Sheets\ValueRange([
+      'values' => $values
+    ]);
+    $params = [
+      'valueInputOption' => "RAW"
+    ];
+    $result = $service->spreadsheets_values->append($spreadsheetId, $range, $body, $params);
+    return $result->updates->updatedRows > 0;
   }
 
   public function post_quiz_ajax() {
@@ -95,11 +77,21 @@ class quizController {
       }
     }
 
+    $dataToSave = [];
+    foreach($data->leadFields as $f) {
+      $dataToSave[] = $f->value;
+    }
+    foreach($data->selectedAnswers as $f) {
+      $dataToSave[] = $f->answer;
+    }
+
     $redirectTo = get_permalink($redirectTo->pageId);
+    $this->save_data_to_gsheet($dataToSave, $quiz_options);
 
     echo json_encode([
       'redirectTo' => $redirectTo,
-      'originalData' => $data
+      'originalData' => $data,
+      'dataToSave' => $dataToSave,
     ]);
     exit;
   }
